@@ -20,10 +20,12 @@ extern int yylineno;
 %token TRUE_ FALSE_
 
 %token IGUAL_ MASIGUAL_ MENOSIGUAL_
-%token ANDAND_ OROR_
+%left OROR_
+%left ANDAND_
 %token IGUALIGUAL_ DIFERENTE_
 %token MAYORQ_ MENORQ_ MAYORIG_ MENORIG_
-%token MAS_ MENOS_ POR_ ENTRE_
+%left MAS_ MENOS_
+%left POR_ ENTRE_
 %token NEG_
 %token MASMAS_ MENOSMENOS_
 
