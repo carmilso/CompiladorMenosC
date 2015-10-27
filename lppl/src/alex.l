@@ -10,20 +10,20 @@ void visualizar(int opcion, char* texto);
 %option yylineno
 
 digito		[0-9]
-id		{letra}({letra} | {digito})*
+id		{letra}({letra}|{digito})*
 delimitador 	[ \t\n]+
 letraMay 	[A-Z]
 letraMin	[a-z]
-letra		{letraMay} | {letraMin} | "_"
+letra		{letraMay}|{letraMin}|"_"
 cte		{digito}+
 
 
 %%
 
 
-{delimitador}	{ECHO;}
-"\n"		{visualizar(0, "");}
-{letraMay}	{ ; }
+{delimitador}	{ ECHO; }
+{letraMay}	{ ECHO; }
+{letraMin}	{ ECHO; }
 
 "{"		{ return (ABRECORCHETE_); }
 "}"		{ return (CIERRACORCHETE_); }
@@ -72,6 +72,8 @@ cte		{digito}+
 
 {id}		{ return (ID_) ; }
 {cte}		{ return (CTE_); }
+
+.		{ visualizar(1, "Caracter no valido:"); }
 
 %%
 
