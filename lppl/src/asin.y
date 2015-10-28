@@ -11,6 +11,8 @@ extern int yylineno;
 %token ID_
 %token CTE_
 
+%token COMENTARIO_
+
 %token INT_ BOOL_
 
 %token READ_ PRINT_
@@ -148,3 +150,6 @@ operadorUnario:
 operadorIncremento:
     MASMAS_
   | MENOSMENOS_;
+
+
+%%

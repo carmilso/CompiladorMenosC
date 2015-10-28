@@ -1,8 +1,8 @@
 /* Subseccion preambulo C */
 %{
 #include <stdio.h>
+#include "asin.h"
 extern FILE *yyin;
-void visualizar(int opcion, char* texto);
 %}
 
 
@@ -16,14 +16,13 @@ letraMay 	[A-Z]
 letraMin	[a-z]
 letra		{letraMay}|{letraMin}|"_"
 cte		{digito}+
+comentario	"//"[^\n]*"\n"
 
 
 %%
 
-
-{delimitador}	{ ECHO; }
-{letraMay}	{ ECHO; }
-{letraMin}	{ ECHO; }
+{comentario}	{ ; }
+{delimitador}	{ ; }
 
 "{"		{ return (ABRECORCHETE_); }
 "}"		{ return (CIERRACORCHETE_); }
@@ -65,7 +64,7 @@ cte		{digito}+
 "if"		{ return (IF_); }
 "else"		{ return (ELSE_); }
 
-"while"		{ return (WHILE_): }
+"while"		{ return (WHILE_); }
 
 "true"		{ return (TRUE_); }
 "false"		{ return (FALSE_); }		
@@ -73,15 +72,6 @@ cte		{digito}+
 {id}		{ return (ID_) ; }
 {cte}		{ return (CTE_); }
 
-.		{ visualizar(1, "Caracter no valido:"); }
+.		{ yyerror("Caracter desconocido"); }
 
 %%
-
-void visualizar(int opcion, char* texto) {
-	switch(opcion) {
-		case 0: printf("%3d- Nueva Linea\n", yylineno);
-			break;
-		case 1: printf("%3d- \%s \%s\n", yylineno, texto, yytext);
-			break;
-	}
-}

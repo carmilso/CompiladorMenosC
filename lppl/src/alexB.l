@@ -85,3 +85,9 @@ void visualizar(int opcion, char* texto) {
 			break;
 	}
 }
+
+int main (int argc, char **argv) {
+	if ((yyin = fopen (argv[1], "r")) == NULL)
+		fprintf (stderr, "Fichero no valido \%s", argv[1]);
+	yylex();
+}

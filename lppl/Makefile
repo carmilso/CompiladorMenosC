@@ -16,11 +16,11 @@ asin.o:	asin.c
 	gcc -c asin.c -I./include $(CC_OPTIONS)
 alex.o:	alex.c asin.c
 	gcc -c alex.c -I./include $(CC_OPTIONS)
-asin.c:	asin.y
-	bison -oasin.c -d asin.y
+asin.c:	src/asin.y
+	bison -oasin.c -d src/asin.y
 	mv asin.h ./include	
-alex.c:	alex.l 
-	flex -oalex.c alex.l
+alex.c:	src/alex.l 
+	flex -oalex.c src/alex.l
 
 clean:
 	rm -f alex.c asin.c ./include/asin.h asin-yac.output 
