@@ -34,15 +34,17 @@ extern int yylineno;
 %%
 
 programa:
-    ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_;
+    	ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_
+  | ABRECORCHETE_ error CIERRACORCHETE_;
 
 secuenciaSentencias:
-    sentencia
+    	sentencia
   | secuenciaSentencias sentencia;
 
 sentencia:
-    declaracion
-  | instruccion;
+    	declaracion
+  | instruccion
+  | error;
 
 declaracion:
 	tipoSimple ID_ PUNTOCOMA_
