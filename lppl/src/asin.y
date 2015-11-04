@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-extern int yylineno;
+#include "header.h"
 %}
 
 %token ABRECORCHETE_ CIERRACORCHETE_
@@ -35,7 +35,7 @@ extern int yylineno;
 
 programa:
     	ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_
-  | ABRECORCHETE_ error CIERRACORCHETE_;
+  | ABRECORCHETE_ CIERRACORCHETE_;
 
 secuenciaSentencias:
     	sentencia
@@ -43,8 +43,7 @@ secuenciaSentencias:
 
 sentencia:
     	declaracion
-  | instruccion
-  | error;
+  | instruccion;
 
 declaracion:
 	tipoSimple ID_ PUNTOCOMA_

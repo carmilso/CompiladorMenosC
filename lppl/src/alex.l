@@ -2,7 +2,9 @@
 %{
 #include <stdio.h>
 #include "asin.h"
-extern FILE *yyin;
+#include "header.h"
+
+#define procesar(x) { if (verbosidad) ECHO; return x; }
 %}
 
 
@@ -10,67 +12,67 @@ extern FILE *yyin;
 %option yylineno
 
 digito		[0-9]
-id		{letra}({letra}|{digito})*
-delimitador 	[ \t\n]+
+id		    {letra}({letra}|{digito})*
+delimitador [ \t\n]+
 letraMay 	[A-Z]
 letraMin	[a-z]
 letra		{letraMay}|{letraMin}|"_"
-cte		{digito}+
-comentario	"//"[^\n]*"\n"
+cte         {digito}+
+comentario  "//"[^\n]*"\n"
 
 
 %%
 
 {comentario}	{ ; }
-{delimitador}	{ ; }
+{delimitador}	{ if (verbosidad) ECHO; }
 
-"{"		{ return (ABRECORCHETE_); }
-"}"		{ return (CIERRACORCHETE_); }
-"["		{ return (ABRECLAUDATOR_); }
-"]"		{ return (CIERRACLAUDATOR_); }
-"("		{ return (ABREPARENTESIS_); }
-")"		{ return (CIERRAPARENTESIS_); }
+"{"		{ procesar (ABRECORCHETE_); }
+"}"		{ procesar (CIERRACORCHETE_); }
+"["		{ procesar (ABRECLAUDATOR_); }
+"]"		{ procesar (CIERRACLAUDATOR_); }
+"("		{ procesar (ABREPARENTESIS_); }
+")"		{ procesar (CIERRAPARENTESIS_); }
 
-";"		{ return (PUNTOCOMA_); }
+";"		{ procesar (PUNTOCOMA_); }
 
-"+="		{ return (MASIGUAL_); }
-"-="		{ return (MENOSIGUAL_); }
-"++"		{ return (MASMAS_); }
-"--"		{ return (MENOSMENOS_); }
-"+"		{ return (MAS_); }
-"-"		{ return (MENOS_); }
-"*"		{ return (POR_); }
-"/"		{ return (ENTRE_); }
+"+="	{ procesar (MASIGUAL_); }
+"-="	{ procesar (MENOSIGUAL_); }
+"++"	{ procesar (MASMAS_); }
+"--"	{ procesar (MENOSMENOS_); }
+"+"		{ procesar (MAS_); }
+"-"		{ procesar (MENOS_); }
+"*"		{ procesar (POR_); }
+"/"		{ procesar (ENTRE_); }
 
-"=="		{ return (IGUALIGUAL_); }
-"!="		{ return (DIFERENTE_); }
-"!"		{ return (NEG_); }
-">="		{ return (MAYORIG_); }
-"<="		{ return (MENORIG_); }
-">"		{ return (MAYORQ_); }
-"<"		{ return (MENORQ_); }
+"=="	{ procesar (IGUALIGUAL_); }
+"!="	{ procesar (DIFERENTE_); }
+"!"		{ procesar (NEG_); }
+">="	{ procesar (MAYORIG_); }
+"<="	{ procesar (MENORIG_); }
+">"		{ procesar (MAYORQ_); }
+"<"		{ procesar (MENORQ_); }
 
-"="		{ return (IGUAL_); }
+"="		{ procesar (IGUAL_); }
 
-"||"		{ return (OROR_); }
-"&&"		{ return (ANDAND_); }
+"||"	{ procesar (OROR_); }
+"&&"	{ procesar (ANDAND_); }
 
-"int"		{ return (INT_); }
-"bool"		{ return (BOOL_); }
+"int"	{ procesar (INT_); }
+"bool"	{ procesar (BOOL_); }
 
-"read"		{ return (READ_); }
-"print"		{ return (PRINT_); }
+"read"	{ procesar (READ_); }
+"print"	{ procesar (PRINT_); }
 
-"if"		{ return (IF_); }
-"else"		{ return (ELSE_); }
+"if"	{ procesar (IF_); }
+"else"	{ procesar (ELSE_); }
 
-"while"		{ return (WHILE_); }
+"while"	{ procesar (WHILE_); }
 
-"true"		{ return (TRUE_); }
-"false"		{ return (FALSE_); }		
+"true"	{ procesar (TRUE_); }
+"false"	{ procesar (FALSE_); }
 
-{id}		{ return (ID_) ; }
-{cte}		{ return (CTE_); }
+{id}	{ procesar (ID_) ; }
+{cte}	{ procesar (CTE_); }
 
 .		{ yyerror("Caracter desconocido"); }
 
