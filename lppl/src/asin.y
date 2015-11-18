@@ -1,15 +1,24 @@
 %{
 #include <stdio.h>
 #include "header.h"
+#include "libtds.h"
 %}
+
+%union
+{
+  char *id;
+  int cte;
+  int tip;
+}
+
 
 %token ABRECORCHETE_ CIERRACORCHETE_
 %token ABRECLAUDATOR_ CIERRACLAUDATOR_
 %token ABREPARENTESIS_ CIERRAPARENTESIS_
 %token PUNTOCOMA_
 
-%token ID_
-%token CTE_
+%token <id> ID_
+%token <cte> CTE_
 
 %token COMENTARIO_
 
@@ -31,10 +40,16 @@
 %token NEG_
 %token MASMAS_ MENOSMENOS_
 
+%type <tip> tipoSimple
+
 %%
 
 programa:
-    	ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_
+    ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_
+
+      { mostrarTDS();
+      }
+
   | ABRECORCHETE_ CIERRACORCHETE_;
 
 secuenciaSentencias:
@@ -46,12 +61,25 @@ sentencia:
   | instruccion;
 
 declaracion:
-	tipoSimple ID_ PUNTOCOMA_
-  | tipoSimple ID_ ABRECLAUDATOR_ CTE_ CIERRACLAUDATOR_ PUNTOCOMA_;
+    tipoSimple ID_ PUNTOCOMA_
+
+	{ printf("Insertando ");
+          printf($2);
+          printf("...\n");
+	  if (!insertarTSimpleTDS($2, $1, dvar))
+	    yyerror("Identificador repetido");
+	  else
+	    dvar += TALLA_TIPO_SIMPLE;
+	}
+
+  | tipoSimple ID_ ABRECLAUDATOR_ CTE_ CIERRACLAUDATOR_ PUNTOCOMA_
+	{ };
 
 tipoSimple:
-	INT_
-  | BOOL_;
+    INT_
+	{ $$ = T_ENTERO; }
+  | BOOL_
+	{ $$ = T_LOGICO; };
 
 instruccion:
 	ABRECORCHETE_ listaInstrucciones CIERRACORCHETE_
