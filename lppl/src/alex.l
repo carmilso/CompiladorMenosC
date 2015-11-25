@@ -1,6 +1,7 @@
 /* Subseccion preambulo C */
 %{
 #include <stdio.h>
+#include <string.h>
 #include "asin.h"
 #include "header.h"
 
@@ -71,9 +72,33 @@ comentario  	"//"[^\n]*"\n"
 "true"		{ procesar (TRUE_); }
 "false"		{ procesar (FALSE_); }
 
-{id}		{ yylval.id = yytext; printf(yylval.id);  procesar (ID_) ; }
-{cte}		{ yylval.cte = atoi(yytext); procesar (CTE_); }
+{id}		{ creaNombre(); procesar (ID_) ; }
+{cte}		{ creaCentera(); procesar (CTE_); }
 
 .		{ yyerror("Caracter desconocido"); }
 
 %%
+/********************************************************************************/
+void creaNombre()
+/* Comprueba que el identificador no exceda la talla maxima (14) o lo trunca */
+{ char *t;
+  if (yyleng > MAX_LENGTH) {
+    fprintf(stdout,"\nWarning at line %d: identificador truncado a longitud %d\n",
+            yylineno, MAX_LENGTH);
+    yyleng=MAX_LENGTH;
+  }
+  t = (char *)malloc(yyleng+1); strncpy(t, yytext, yyleng);
+  t[yyleng] = '\0'; yylval.id = t;
+}
+/********************************************************************************/
+void creaCentera()
+/* Transforma una subcadena a la constante entera que representa */
+{ yylval.cte = atoi(yytext); }
+/********************************************************************************/
+void truncCreal()
+/* Transforma una subcadena a una constante entera truncandola. */
+{ yylval.cte = atoi(yytext);
+  fprintf(stdout,"\nWarning at line %d: constante real truncada a entera %d\n",
+          yylineno,yylval.cte);
+}
+/********************************************************************************/

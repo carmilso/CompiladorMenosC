@@ -9,6 +9,7 @@
   char *id;
   int cte;
   int tip;
+  /*SIMB expre; /*para los no terminales expresion*/
 }
 
 
@@ -63,9 +64,7 @@ sentencia:
 declaracion:
     tipoSimple ID_ PUNTOCOMA_
 
-	{ printf("Insertando ");
-          printf($2);
-          printf("...\n");
+	{ 
 	  if (!insertarTSimpleTDS($2, $1, dvar))
 	    yyerror("Identificador repetido");
 	  else
@@ -73,7 +72,16 @@ declaracion:
 	}
 
   | tipoSimple ID_ ABRECLAUDATOR_ CTE_ CIERRACLAUDATOR_ PUNTOCOMA_
-	{ };
+	{ int numelem = $4;
+    if ($4 <= 0) {
+      yyerror("Talla inapropiada del array");
+      numelem = 0;
+    }
+    if (!insertarTVectorTDS($2, T_ARRAY, dvar, $1, numelem))
+      yyerror("Identificador repetido");
+    else
+      dvar += TALLA_TIPO_SIMPLE * $4;
+	};
 
 tipoSimple:
     INT_
@@ -108,6 +116,15 @@ instruccionIteracion:
 expresion:
 	expresionLogica
   | ID_ operadorAsignacion expresion
+  { SIMB sim = obtenerTDS($1); $$.tipo = T_ERROR;
+    if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+    else if (!((($3.tipo == T_ENTERO) || ($3.tipo == T_LOGICO)) &&
+              ((sim.tipo == T_ENTERO) || (sim.tipo == T_LOGICO)) &&
+               (sim.tipo == $3.tipo)))
+      yyerror("Error de tipos en la ‘asignacion’");
+    else $$.tipo = sim.tipo;
+  }
+  
   | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion;
 
 expresionLogica:

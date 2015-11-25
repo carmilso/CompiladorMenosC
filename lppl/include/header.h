@@ -10,6 +10,7 @@
 #define FALSE 0
 /************************************************************** Talla tipos  */
 #define TALLA_TIPO_SIMPLE 1
+#define MAX_LENGTH 14
 /************************************* Variables externas definidas en el AL */
 extern FILE *yyin;
 extern int   yylineno;
@@ -20,4 +21,8 @@ extern int verbosidad;              /* Flag para saber si se desea una traza */
 extern int numErrores;              /* Contador del numero de errores        */
 
 #endif  /* _HEADER_H */
-/*****************************************************************************/
+/****************************************Funciones para el analizador lexico */
+void creaNombre();
+void creaCentera();
+void truncCreal();
+/********************************************************************************/
