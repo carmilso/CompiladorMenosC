@@ -25,4 +25,9 @@ extern int numErrores;              /* Contador del numero de errores        */
 void creaNombre();
 void creaCentera();
 void truncCreal();
-/********************************************************************************/
+/*****************************************************************************/
+typedef struct 
+{
+  int tipo;
+  int pos;
+} EXPR;

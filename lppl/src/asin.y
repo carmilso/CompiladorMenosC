@@ -9,7 +9,7 @@
   char *id;
   int cte;
   int tip;
-  /*SIMB expre; /*para los no terminales expresion*/
+  EXPR expre; /*para los no terminales expresion*/
 }
 
 
@@ -42,6 +42,7 @@
 %token MASMAS_ MENOSMENOS_
 
 %type <tip> tipoSimple
+%type <expre> expresion
 
 %%
 
@@ -105,27 +106,47 @@ instruccionExpresion:
 
 instruccionEntradaSalida:
 	READ_ ABREPARENTESIS_ ID_ CIERRAPARENTESIS_ PUNTOCOMA_
+	{ SIMB sim = obtenerTDS($3);
+	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+	}
   | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_;
 
 instruccionSeleccion:
-	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion ELSE_ instruccion;
+	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion ELSE_ instruccion
+	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
+	};
 
 instruccionIteracion:
-	WHILE_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion;
+	WHILE_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion
+	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
+	};
 
 expresion:
-	expresionLogica
+    expresionLogica
+  { $$.tipo = T_LOGICO;
+  }
+  
   | ID_ operadorAsignacion expresion
   { SIMB sim = obtenerTDS($1); $$.tipo = T_ERROR;
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
     else if (!((($3.tipo == T_ENTERO) || ($3.tipo == T_LOGICO)) &&
               ((sim.tipo == T_ENTERO) || (sim.tipo == T_LOGICO)) &&
                (sim.tipo == $3.tipo)))
-      yyerror("Error de tipos en la ‘asignacion’");
+      yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
   }
   
-  | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion;
+  | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion
+  { SIMB sim = obtenerTDS($1); $$.tipo = T_ERROR;
+    if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+    else if ($3.tipo != T_ENTERO) yyerror("Indice no entero");
+    else if (sim.tipo != T_ARRAY) yyerror("El objeto debe ser un vector");
+    else if (!((($6.tipo == T_ENTERO) || ($6.tipo == T_LOGICO)) &&
+              ((sim.telem == T_ENTERO) || (sim.telem == T_LOGICO)) &&
+               (sim.telem == $6.tipo)))
+	  yyerror("Error de tipos en la 'asignacion'");
+	else $$.tipo = sim.telem;
+  };
 
 expresionLogica:
 	expresionIgualdad

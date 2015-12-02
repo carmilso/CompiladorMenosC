@@ -156,7 +156,7 @@ typedef union YYSTYPE
   char *id;
   int cte;
   int tip;
-  /*SIMB expre; /*para los no terminales expresion*/
+  EXPR expre; /*para los no terminales expresion*/
 
 
 /* Line 387 of yacc.c  */
@@ -503,13 +503,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    54,    57,    58,    61,    62,    65,    74,
-      87,    89,    93,    94,    95,    96,    97,    99,   100,   103,
-     104,   107,   108,   111,   114,   117,   118,   119,   122,   123,
-     126,   127,   130,   131,   134,   135,   138,   139,   142,   143,
-     144,   147,   148,   149,   150,   151,   152,   153,   156,   157,
-     158,   161,   162,   165,   166,   169,   170,   171,   172,   175,
-     176,   179,   180,   183,   184,   185,   188,   189
+       0,    50,    50,    55,    58,    59,    62,    63,    66,    75,
+      88,    90,    94,    95,    96,    97,    98,   100,   101,   104,
+     105,   108,   112,   115,   120,   125,   129,   139,   152,   153,
+     156,   157,   160,   161,   164,   165,   168,   169,   172,   173,
+     174,   177,   178,   179,   180,   181,   182,   183,   186,   187,
+     188,   191,   192,   195,   196,   199,   200,   201,   202,   205,
+     206,   209,   210,   213,   214,   215,   218,   219
 };
 #endif
 
@@ -1506,14 +1506,14 @@ yyreduce:
     {
         case 2:
 /* Line 1792 of yacc.c  */
-#line 51 "src/asin.y"
+#line 52 "src/asin.y"
     { mostrarTDS();
       }
     break;
 
   case 8:
 /* Line 1792 of yacc.c  */
-#line 67 "src/asin.y"
+#line 68 "src/asin.y"
     { 
 	  if (!insertarTSimpleTDS((yyvsp[(2) - (3)].id), (yyvsp[(1) - (3)].tip), dvar))
 	    yyerror("Identificador repetido");
@@ -1524,7 +1524,7 @@ yyreduce:
 
   case 9:
 /* Line 1792 of yacc.c  */
-#line 75 "src/asin.y"
+#line 76 "src/asin.y"
     { int numelem = (yyvsp[(4) - (6)].cte);
     if ((yyvsp[(4) - (6)].cte) <= 0) {
       yyerror("Talla inapropiada del array");
@@ -1539,19 +1539,76 @@ yyreduce:
 
   case 10:
 /* Line 1792 of yacc.c  */
-#line 88 "src/asin.y"
+#line 89 "src/asin.y"
     { (yyval.tip) = T_ENTERO; }
     break;
 
   case 11:
 /* Line 1792 of yacc.c  */
-#line 90 "src/asin.y"
+#line 91 "src/asin.y"
     { (yyval.tip) = T_LOGICO; }
+    break;
+
+  case 21:
+/* Line 1792 of yacc.c  */
+#line 109 "src/asin.y"
+    { SIMB sim = obtenerTDS((yyvsp[(3) - (5)].id));
+	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+	}
+    break;
+
+  case 23:
+/* Line 1792 of yacc.c  */
+#line 116 "src/asin.y"
+    { if ((yyvsp[(3) - (7)].expre).tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
+	}
+    break;
+
+  case 24:
+/* Line 1792 of yacc.c  */
+#line 121 "src/asin.y"
+    { if ((yyvsp[(3) - (5)].expre).tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
+	}
+    break;
+
+  case 25:
+/* Line 1792 of yacc.c  */
+#line 126 "src/asin.y"
+    { (yyval.expre).tipo = T_LOGICO;
+  }
+    break;
+
+  case 26:
+/* Line 1792 of yacc.c  */
+#line 130 "src/asin.y"
+    { SIMB sim = obtenerTDS((yyvsp[(1) - (3)].id)); (yyval.expre).tipo = T_ERROR;
+    if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+    else if (!((((yyvsp[(3) - (3)].expre).tipo == T_ENTERO) || ((yyvsp[(3) - (3)].expre).tipo == T_LOGICO)) &&
+              ((sim.tipo == T_ENTERO) || (sim.tipo == T_LOGICO)) &&
+               (sim.tipo == (yyvsp[(3) - (3)].expre).tipo)))
+      yyerror("Error de tipos en la 'asignacion'");
+    else (yyval.expre).tipo = sim.tipo;
+  }
+    break;
+
+  case 27:
+/* Line 1792 of yacc.c  */
+#line 140 "src/asin.y"
+    { SIMB sim = obtenerTDS((yyvsp[(1) - (6)].id)); (yyval.expre).tipo = T_ERROR;
+    if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+    else if ((yyvsp[(3) - (6)].expre).tipo != T_ENTERO) yyerror("Indice no entero");
+    else if (sim.tipo != T_ARRAY) yyerror("El objeto debe ser un vector");
+    else if (!((((yyvsp[(6) - (6)].expre).tipo == T_ENTERO) || ((yyvsp[(6) - (6)].expre).tipo == T_LOGICO)) &&
+              ((sim.telem == T_ENTERO) || (sim.telem == T_LOGICO)) &&
+               (sim.telem == (yyvsp[(6) - (6)].expre).tipo)))
+	  yyerror("Error de tipos en la 'asignacion'");
+	else (yyval.expre).tipo = sim.telem;
+  }
     break;
 
 
 /* Line 1792 of yacc.c  */
-#line 1555 "asin.c"
+#line 1612 "asin.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1783,5 +1840,5 @@ yyreturn:
 
 
 /* Line 2055 of yacc.c  */
-#line 192 "src/asin.y"
+#line 222 "src/asin.y"
 

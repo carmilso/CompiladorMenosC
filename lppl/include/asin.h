@@ -96,7 +96,7 @@ typedef union YYSTYPE
   char *id;
   int cte;
   int tip;
-  /*SIMB expre; /*para los no terminales expresion*/
+  EXPR expre; /*para los no terminales expresion*/
 
 
 /* Line 2058 of yacc.c  */
