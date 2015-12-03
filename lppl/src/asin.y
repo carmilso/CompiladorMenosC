@@ -4,12 +4,13 @@
 #include "libtds.h"
 %}
 
+
 %union
 {
   char *id;
   int cte;
   int tip;
-  EXPR expre; /*para los no terminales expresion*/
+  EXPR expr; /*para los no terminales expresion*/
 }
 
 
@@ -42,7 +43,7 @@
 %token MASMAS_ MENOSMENOS_
 
 %type <tip> tipoSimple
-%type <expre> expresion
+%type <expr> expresion
 
 %%
 
@@ -65,7 +66,7 @@ sentencia:
 declaracion:
     tipoSimple ID_ PUNTOCOMA_
 
-	{ 
+	{
 	  if (!insertarTSimpleTDS($2, $1, dvar))
 	    yyerror("Identificador repetido");
 	  else
@@ -125,7 +126,7 @@ expresion:
     expresionLogica
   { $$.tipo = T_LOGICO;
   }
-  
+
   | ID_ operadorAsignacion expresion
   { SIMB sim = obtenerTDS($1); $$.tipo = T_ERROR;
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
@@ -135,7 +136,7 @@ expresion:
       yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
   }
-  
+
   | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion
   { SIMB sim = obtenerTDS($1); $$.tipo = T_ERROR;
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");

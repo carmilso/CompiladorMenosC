@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /**   Ejemplo de un posible fichero de cabeceras ("header.h") donde situar  **/
 /** las definiciones de constantes, variables y estructuras para MenosC.16  **/
-/** Los alumos deberan adaptarlo al desarrollo de su propio compilador.     **/ 
+/** Los alumos deberan adaptarlo al desarrollo de su propio compilador.     **/
 /*****************************************************************************/
 #ifndef _HEADER_H
 #define _HEADER_H
@@ -19,15 +19,16 @@ extern char *yytext;
 /********************* Variables externas definidas en el Programa Principal */
 extern int verbosidad;              /* Flag para saber si se desea una traza */
 extern int numErrores;              /* Contador del numero de errores        */
-
-#endif  /* _HEADER_H */
 /****************************************Funciones para el analizador lexico */
 void creaNombre();
 void creaCentera();
 void truncCreal();
-/*****************************************************************************/
-typedef struct 
+/****************************************Estructuras *************************/
+typedef struct expr
 {
   int tipo;
   int pos;
 } EXPR;
+/*****************************************************************************/
+
+#endif  /* _HEADER_H */
