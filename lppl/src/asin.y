@@ -1,7 +1,15 @@
+/*****************************************************************************/
+/*  Analizador sintáctico del compilador Menos C                             */
+/*  Autores:                                                                 */
+/*        Pau Baquero Arnal       pabaar@inf.upv.es                          */
+/*        Axel Guzmán Godia       axguzgo@inf.upv.es                         */
+/*        Carlos Millán Soler     carmilso@inf.upv.es                        */
+/*****************************************************************************/
+
 %{
 #include <stdio.h>
-#include "header.h"
 #include "libtds.h"
+#include "header.h"
 %}
 
 
@@ -10,7 +18,10 @@
   char *id;
   int cte;
   int tip;
-  EXPR expr; /*para los no terminales expresion*/
+  struct {
+    int tipo;
+    int pos;
+  } expr; /*para los no terminales expresion*/
 }
 
 
@@ -42,27 +53,32 @@
 %token NEG_
 %token MASMAS_ MENOSMENOS_
 
-%type <tip> tipoSimple
-%type <expr> expresion
+%type <tip> tipoSimple operadorUnario
+%type <expr> expresion expresionLogica expresionIgualdad expresionRelacional expresionAditiva expresionMultiplicativa expresionUnaria expresionSufija
 
 %%
 
+/************************************************************************/
 programa:
     ABRECORCHETE_ secuenciaSentencias CIERRACORCHETE_
-
-      { mostrarTDS();
+      { if (flagMostrarTDS) mostrarTDS();
       }
-
   | ABRECORCHETE_ CIERRACORCHETE_;
+/************************************************************************/
 
+/************************************************************************/
 secuenciaSentencias:
     	sentencia
   | secuenciaSentencias sentencia;
+/************************************************************************/
 
+/************************************************************************/
 sentencia:
     	declaracion
   | instruccion;
+/************************************************************************/
 
+/************************************************************************/
 declaracion:
     tipoSimple ID_ PUNTOCOMA_
 
@@ -84,47 +100,63 @@ declaracion:
     else
       dvar += TALLA_TIPO_SIMPLE * $4;
 	};
+/************************************************************************/
 
+/************************************************************************/
 tipoSimple:
     INT_
 	{ $$ = T_ENTERO; }
   | BOOL_
 	{ $$ = T_LOGICO; };
+/************************************************************************/
 
+/************************************************************************/
 instruccion:
 	ABRECORCHETE_ listaInstrucciones CIERRACORCHETE_
   | instruccionExpresion
   | instruccionEntradaSalida
   | instruccionSeleccion
   | instruccionIteracion;
+/************************************************************************/
 
+/************************************************************************/
 listaInstrucciones:
   | listaInstrucciones instruccion;
+/************************************************************************/
 
+/************************************************************************/
 instruccionExpresion:
 	expresion PUNTOCOMA_
   | PUNTOCOMA_;
+/************************************************************************/
 
+/************************************************************************/
 instruccionEntradaSalida:
 	READ_ ABREPARENTESIS_ ID_ CIERRAPARENTESIS_ PUNTOCOMA_
 	{ SIMB sim = obtenerTDS($3);
 	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
 	}
   | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_;
+/************************************************************************/
 
+/************************************************************************/
 instruccionSeleccion:
 	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion ELSE_ instruccion
 	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
 	};
+/************************************************************************/
 
+/************************************************************************/
 instruccionIteracion:
 	WHILE_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion
 	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
 	};
+/************************************************************************/
 
+/************************************************************************/
 expresion:
     expresionLogica
-  { $$.tipo = T_LOGICO;
+  { $$.tipo = $1.tipo;
   }
 
   | ID_ operadorAsignacion expresion
@@ -148,76 +180,199 @@ expresion:
 	  yyerror("Error de tipos en la 'asignacion'");
 	else $$.tipo = sim.telem;
   };
+/************************************************************************/
 
+/************************************************************************/
 expresionLogica:
 	expresionIgualdad
-  | expresionLogica operadorLogico expresionIgualdad;
+    { $$.tipo = $1.tipo;
+    }
+  | expresionLogica operadorLogico expresionIgualdad
+  { $$.tipo = T_ERROR;
+    if ($1.tipo != T_LOGICO || $3.tipo != T_LOGICO)
+        yyerror("Los tipos no son 'T_LOGICO'");
+    else
+        $$.tipo = $1.tipo;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionIgualdad:
 	expresionRelacional
-  | expresionIgualdad operadorIgualdad expresionRelacional;
+    { $$.tipo = $1.tipo;
+    }
+  | expresionIgualdad operadorIgualdad expresionRelacional
+  { $$.tipo = T_ERROR;
+    if (!((($1.tipo == T_ENTERO) || ($1.tipo == T_LOGICO)) &&
+        (($3.tipo == T_ENTERO) || ($3.tipo == T_LOGICO)) &&
+        ($1.tipo == $3.tipo)))
+        yyerror("Las expresiones no son del mismo tipo o no son validas");
+    else
+        $$.tipo = T_LOGICO;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionRelacional:
 	expresionAditiva
-  | expresionRelacional operadorRelacional expresionAditiva;
+    { $$.tipo = $1.tipo;
+    }
+  | expresionRelacional operadorRelacional expresionAditiva
+  { $$.tipo = T_ERROR;
+    if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
+        yyerror("Los tipos deben ser enteros para comparar");
+    else
+        $$.tipo = T_LOGICO;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionAditiva:
 	expresionMultiplicativa
-  | expresionAditiva operadorAditivo expresionMultiplicativa;
+    { $$.tipo = $1.tipo;
+    }
+  | expresionAditiva operadorAditivo expresionMultiplicativa
+  { $$.tipo = T_ERROR;
+    if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
+        yyerror("Los tipos deben ser enteros para operar");
+    else
+        $$.tipo = T_ENTERO;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionMultiplicativa:
 	expresionUnaria
-  | expresionMultiplicativa operadorMultiplicativo expresionUnaria;
+    { $$.tipo = $1.tipo;
+    }
+  | expresionMultiplicativa operadorMultiplicativo expresionUnaria
+  { $$.tipo = T_ERROR;
+    if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
+        yyerror("Los tipos deben ser enteros para operar");
+    else
+        $$.tipo = T_ENTERO;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionUnaria:
 	expresionSufija
+    { $$.tipo = $1.tipo;
+    }
   | operadorUnario expresionUnaria
-  | operadorIncremento ID_;
+  { $$.tipo = T_ERROR;
+    if ($1 != $2.tipo)
+        yyerror("Esta operacion no es valida para este tipo");
+    else
+        $$.tipo = $2.tipo;
+  }
+  | operadorIncremento ID_
+  { $$.tipo = T_ERROR;
+    SIMB sim = obtenerTDS($2);
+    if (sim.tipo == T_ERROR)
+        yyerror("El identificador no esta declarado");
+    else if (sim.tipo != T_ENTERO)
+        yyerror("Esta operacion no es valida para este tipo");
+    else
+        $$.tipo = T_ENTERO;
+  };
+/************************************************************************/
 
+/************************************************************************/
 expresionSufija:
 	ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_
+    { $$.tipo = T_ERROR;
+      SIMB sim = obtenerTDS($1);
+      if (sim.tipo == T_ERROR)
+          yyerror("El identificador no esta declarado");
+      else if ($3.tipo != T_ENTERO)
+          yyerror("El indice debe ser entero");
+      else
+          $$.tipo = sim.telem;
+    }
   | ABREPARENTESIS_ expresion CIERRAPARENTESIS_
+  { $$.tipo = $2.tipo;
+  }
   | ID_
+  { $$.tipo = T_ERROR;
+    SIMB sim = obtenerTDS($1);
+    if (sim.tipo == T_ERROR)
+        yyerror("El identificador no esta declarado");
+    else
+        $$.tipo = sim.tipo;
+  }
   | ID_ operadorIncremento
+  { $$.tipo = T_ERROR;
+    SIMB sim = obtenerTDS($1);
+    if (sim.tipo == T_ERROR)
+        yyerror("El identificador no esta declarado");
+    else if (sim.tipo != T_ENTERO)
+        yyerror("La variable debe ser entera");
+    else
+        $$.tipo = sim.tipo;
+  }
   | CTE_
+  { $$.tipo = T_ENTERO; }
   | TRUE_
-  | FALSE_;
+  { $$.tipo = T_LOGICO; }
+  | FALSE_
+  { $$.tipo = T_LOGICO; };
+/************************************************************************/
 
+/************************************************************************/
 operadorAsignacion:
 	IGUAL_
   | MASIGUAL_
   | MENOSIGUAL_;
+/************************************************************************/
 
+/************************************************************************/
 operadorLogico:
 	ANDAND_
   | OROR_;
+/************************************************************************/
 
+/************************************************************************/
 operadorIgualdad:
 	IGUALIGUAL_
   | DIFERENTE_;
+/************************************************************************/
 
+/************************************************************************/
 operadorRelacional:
     MAYORQ_
   | MENORQ_
   | MAYORIG_
   | MENORIG_;
+/************************************************************************/
 
+/************************************************************************/
 operadorAditivo:
 	MAS_
   | MENOS_;
+/************************************************************************/
 
+/************************************************************************/
 operadorMultiplicativo:
     POR_
   | ENTRE_;
+/************************************************************************/
 
+/************************************************************************/
 operadorUnario:
     MAS_
+    { $$ = T_ENTERO; }
   | MENOS_
-  | NEG_;
+  { $$ = T_ENTERO; }
+  | NEG_
+  { $$ = T_LOGICO; };
+/************************************************************************/
 
+/************************************************************************/
 operadorIncremento:
     MASMAS_
   | MENOSMENOS_;
+/************************************************************************/
 
 
 %%

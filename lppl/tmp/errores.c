@@ -1,14 +1,8 @@
 // Prova per a errors
 {
 	int a;
+	a = -3;
 	bool b;
-
-	Efren = a +++;		//error: linea 6
-	int pau;
-	int carlos;
-	Pau = b++		//error: linea 9
-	pau = a+b;
-	a++;
-	69---;			//error: linea 12
-
+	b = !true;
+	(a>a-1) == b;
 }

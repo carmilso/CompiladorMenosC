@@ -1,3 +1,11 @@
+/*****************************************************************************/
+/*  Analizador léxico del compilador Menos C                                 */
+/*  Autores:                                                                 */
+/*        Pau Baquero Arnal       pabaar@inf.upv.es                          */
+/*        Axel Guzmán Godia       axguzgo@inf.upv.es                         */
+/*        Carlos Millán Soler     carmilso@inf.upv.es                        */
+/*****************************************************************************/
+
 /* Subseccion preambulo C */
 %{
 #include <stdio.h>
@@ -12,70 +20,70 @@
 /* Subseccion de definiciones */
 %option yylineno
 
-digito		[0-9]
-id		{letra}({letra}|{digito})*
-delimitador 	[ \t\n]+
-letraMay 	[A-Z]
-letraMin	[a-z]
-letra		{letraMay}|{letraMin}|"_"
-cte         	{digito}+
-comentario  	"//"[^\n]*"\n"
+digito          [0-9]
+id              {letra}({letra}|{digito})*
+delimitador     [ \t\n]+
+letraMay        [A-Z]
+letraMin        [a-z]
+letra           {letraMay}|{letraMin}|"_"
+cte             {digito}+
+comentario      "//"[^\n]*"\n"
 
 
 %%
 
-{comentario}	{ ; }
-{delimitador}	{ if (verbosidad) ECHO; }
+{comentario}    { ; }
+{delimitador}   { if (verbosidad) ECHO; }
 
-"{"		{ procesar (ABRECORCHETE_); }
-"}"		{ procesar (CIERRACORCHETE_); }
-"["		{ procesar (ABRECLAUDATOR_); }
-"]"		{ procesar (CIERRACLAUDATOR_); }
-"("		{ procesar (ABREPARENTESIS_); }
-")"		{ procesar (CIERRAPARENTESIS_); }
+"{"             { procesar (ABRECORCHETE_); }
+"}"             { procesar (CIERRACORCHETE_); }
+"["             { procesar (ABRECLAUDATOR_); }
+"]"             { procesar (CIERRACLAUDATOR_); }
+"("             { procesar (ABREPARENTESIS_); }
+")"             { procesar (CIERRAPARENTESIS_); }
 
-";"		{ procesar (PUNTOCOMA_); }
+";"             { procesar (PUNTOCOMA_); }
 
-"+="		{ procesar (MASIGUAL_); }
-"-="		{ procesar (MENOSIGUAL_); }
-"++"		{ procesar (MASMAS_); }
-"--"		{ procesar (MENOSMENOS_); }
-"+"		{ procesar (MAS_); }
-"-"		{ procesar (MENOS_); }
-"*"		{ procesar (POR_); }
-"/"		{ procesar (ENTRE_); }
+"+="            { procesar (MASIGUAL_); }
+"-="            { procesar (MENOSIGUAL_); }
+"++"            { procesar (MASMAS_); }
+"--"            { procesar (MENOSMENOS_); }
+"+"             { procesar (MAS_); }
+"-"             { procesar (MENOS_); }
+"*"             { procesar (POR_); }
+"/"             { procesar (ENTRE_); }
 
-"=="		{ procesar (IGUALIGUAL_); }
-"!="		{ procesar (DIFERENTE_); }
-"!"		{ procesar (NEG_); }
-">="		{ procesar (MAYORIG_); }
-"<="		{ procesar (MENORIG_); }
-">"		{ procesar (MAYORQ_); }
-"<"		{ procesar (MENORQ_); }
+"=="            { procesar (IGUALIGUAL_); }
+"!="            { procesar (DIFERENTE_); }
+"!"             { procesar (NEG_); }
+">="            { procesar (MAYORIG_); }
+"<="            { procesar (MENORIG_); }
+">"             { procesar (MAYORQ_); }
+"<"             { procesar (MENORQ_); }
 
-"="		{ procesar (IGUAL_); }
+"="             { procesar (IGUAL_); }
 
-"||"		{ procesar (OROR_); }
-"&&"		{ procesar (ANDAND_); }
+"||"            { procesar (OROR_); }
+"&&"            { procesar (ANDAND_); }
 
-"int"		{ procesar (INT_); }
-"bool"		{ procesar (BOOL_); }
+"int"           { procesar (INT_); }
+"bool"          { procesar (BOOL_); }
 
-"read"		{ procesar (READ_); }
-"print"		{ procesar (PRINT_); }
+"read"          { procesar (READ_); }
+"print"         { procesar (PRINT_); }
 
-"if"		{ procesar (IF_); }
-"else"		{ procesar (ELSE_); }
+"if"            { procesar (IF_); }
+"else"          { procesar (ELSE_); }
 
-"while"		{ procesar (WHILE_); }
+"while"         { procesar (WHILE_); }
 
-"true"		{ procesar (TRUE_); }
-"false"		{ procesar (FALSE_); }
+"true"          { procesar (TRUE_); }
+"false"         { procesar (FALSE_); }
 
-{id}		{ creaNombre(); procesar (ID_) ; }
-{cte}		{ creaCentera(); procesar (CTE_); }
+{id}            { creaNombre(); procesar (ID_) ; }
+{cte}           { creaCentera(); procesar (CTE_); }
 
-.		{ yyerror("Caracter desconocido"); }
+.               { yyerror("Caracter desconocido"); }
 
 %%
 /********************************************************************************/
