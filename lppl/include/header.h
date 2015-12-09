@@ -29,6 +29,7 @@ void creaCentera();
 void truncCreal();
 /****************************************Estructuras *************************/
 
+/***************************** Variables externas definidas en las librerías */
+extern int si;
 /*****************************************************************************/
-
 #endif  /* _HEADER_H */

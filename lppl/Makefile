@@ -7,7 +7,7 @@
 ###############################################################################
 
 CC_OPTIONS = -pedantic
-CC_LIBRARY = -lfl -ltds
+CC_LIBRARY = -lfl -ltds -lgci
 CC_LINKS_FLAGS = $(CC_LIBRARY) $(CC_OPTIONS)
 OBJECTS = ./alex.o  ./asin.o ./principal.o
 

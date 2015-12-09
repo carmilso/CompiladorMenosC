@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "header.h"
+#include "libgci.h"
 
 int verbosidad=FALSE;               /* Flag para saber si se desea una traza */
 int numErrores=0;                   /* Contador del numero de errores        */
@@ -23,7 +24,8 @@ void yyerror(const char * msg)
 /*****************************************************************************/
 int main (int argc, char **argv)
 /* Gestiona la linea de comandos e invoca al analizador sintactico-semantico.*/
-{ int i, n = 0;
+{ char *nom_fich;
+  int i, n = 0;
 
   for (i=0; i<argc; ++i) {
     if (strcmp(argv[i], "-v")==0) { verbosidad = TRUE; n++; }
@@ -35,9 +37,16 @@ int main (int argc, char **argv)
       fprintf (stderr, "Fichero no valido %s\n", argv[argc]);
     else {
       if (verbosidad == TRUE) fprintf(stdout,"%3d.- ", yylineno);
+      nom_fich = argv[argc];
       yyparse ();
+      fprintf(stdout, "numErrores = %d\n", numErrores);
       if (numErrores > 0)
         fprintf(stdout,"\nNumero de errores:      %d\n", numErrores);
+      else
+      {
+        fprintf(stdout, "Volcando codigo...\n");
+        volcarCodigo(nom_fich);
+      }
     }
   }
   else fprintf (stderr, "Uso: cmc [-v] [-t] fichero\n");

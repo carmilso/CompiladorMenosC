@@ -6,9 +6,14 @@
 /*        Carlos Millán Soler     carmilso@inf.upv.es                        */
 /*****************************************************************************/
 
+
+/* TODO: Ajustar espais de les regles */
+
+
 %{
 #include <stdio.h>
 #include "libtds.h"
+#include "libgci.h"
 #include "header.h"
 %}
 
@@ -135,15 +140,24 @@ instruccionEntradaSalida:
 	READ_ ABREPARENTESIS_ ID_ CIERRAPARENTESIS_ PUNTOCOMA_
 	{ SIMB sim = obtenerTDS($3);
 	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
+	  else emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
 	}
-  | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_;
+  | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_
+  { emite(EWRITE, crArgNul(), crArgNul(), crArgPos($3.pos));
+  };
 /************************************************************************/
 
 /************************************************************************/
 instruccionSeleccion:
-	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion ELSE_ instruccion
+	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_
 	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
-	};
+	  $<cte>$ = creaLans(si);
+	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgPos($<cte>$));
+	}
+	instruccion
+	{ $<cte>$ = creaLans(si); 
+	}
+	ELSE_ instruccion;
 /************************************************************************/
 
 /************************************************************************/
