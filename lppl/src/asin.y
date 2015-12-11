@@ -150,12 +150,12 @@ instruccionEntradaSalida:
 /************************************************************************/
 instruccionSeleccion:
 	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_
-	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
+	{ if ($3.tipo != T_ERROR && $3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
 	  $<cte>$ = creaLans(si);
 	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgPos($<cte>$));
 	}
 	instruccion
-	{ $<cte>$ = creaLans(si); 
+	{ $<cte>$ = creaLans(si);
 	}
 	ELSE_ instruccion;
 /************************************************************************/
@@ -178,7 +178,7 @@ expresion:
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
     else if (!((($3.tipo == T_ENTERO) || ($3.tipo == T_LOGICO)) &&
               ((sim.tipo == T_ENTERO) || (sim.tipo == T_LOGICO)) &&
-               (sim.tipo == $3.tipo)))
+               (sim.tipo == $3.tipo)) && ($3.tipo != T_ERROR))
       yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
   }
@@ -190,7 +190,7 @@ expresion:
     else if (sim.tipo != T_ARRAY) yyerror("El objeto debe ser un vector");
     else if (!((($6.tipo == T_ENTERO) || ($6.tipo == T_LOGICO)) &&
               ((sim.telem == T_ENTERO) || (sim.telem == T_LOGICO)) &&
-               (sim.telem == $6.tipo)))
+               (sim.telem == $6.tipo)) && ($3.tipo != T_ERROR))
 	  yyerror("Error de tipos en la 'asignacion'");
 	else $$.tipo = sim.telem;
   };
