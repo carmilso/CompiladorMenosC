@@ -7,9 +7,6 @@
 /*****************************************************************************/
 
 
-/* TODO: Ajustar espais de les regles */
-
-
 %{
 #include <stdio.h>
 #include "libtds.h"
@@ -58,11 +55,27 @@
 %token NEG_
 %token MASMAS_ MENOSMENOS_
 
-/* TODO: cada tipo en una linea */
 
-%type <tip> tipoSimple operadorUnario
-%type <expr> expresion expresionLogica expresionIgualdad expresionRelacional expresionAditiva expresionMultiplicativa expresionUnaria expresionSufija
-%type <cte> operadorAsignacion operadorLogico operadorIgualdad operadorRelacional operadorAditivo operadorMultiplicativo operadorUnario operadorIncrmento
+%type <tip> tipoSimple
+%type <tip> operadorUnario
+
+%type <expr> expresion 
+%type <expr> expresionLogica 
+%type <expr> expresionIgualdad 
+%type <expr> expresionRelacional
+%type <expr> expresionAditiva
+%type <expr> expresionMultiplicativa
+%type <expr> expresionUnaria
+%type <expr> expresionSufija
+
+%type <cte> operadorAsignacion
+%type <cte> operadorLogico
+%type <cte> operadorIgualdad
+%type <cte> operadorRelacional
+%type <cte> operadorAditivo
+%type <cte> operadorMultiplicativo
+%type <cte> operadorUnario
+%type <cte> operadorIncrmento
 
 %%
 
