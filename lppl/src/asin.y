@@ -58,8 +58,11 @@
 %token NEG_
 %token MASMAS_ MENOSMENOS_
 
+/* TODO: cada tipo en una linea */
+
 %type <tip> tipoSimple operadorUnario
 %type <expr> expresion expresionLogica expresionIgualdad expresionRelacional expresionAditiva expresionMultiplicativa expresionUnaria expresionSufija
+%type <cte> operadorAsignacion operadorLogico operadorIgualdad operadorRelacional operadorAditivo operadorMultiplicativo operadorUnario operadorIncrmento
 
 %%
 
@@ -155,22 +158,38 @@ instruccionSeleccion:
 	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgPos($<cte>$));
 	}
 	instruccion
-	{ $<cte>$ = creaLans(si);
+	{ completaLans($<cte>5, crArgPos(si));
 	}
 	ELSE_ instruccion;
 /************************************************************************/
 
 /************************************************************************/
 instruccionIteracion:
-	WHILE_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ instruccion
-	{ if ($3.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
-	};
+	WHILE_
+	{ 
+          $<cte>$ = si;
+       	}
+	ABREPARENTESIS_ expresion CIERRAPARENTESIS_
+	{
+	  if ($3.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
+	  $<cte>$ = creaLans(si);
+	  emite(EIGUAL, crArgPos($4.pos), crArgEnt(0), crArgPos($<cte>$));
+	}
+	instruccion
+	{
+	  emite(GOTOS, crArgNul(), crArgNul(), crArgPos($<cte>2));
+	  completaLans($<cte>5, crArgPos(si));
+	}
+	;
+
 /************************************************************************/
 
 /************************************************************************/
 expresion:
     expresionLogica
   { $$.tipo = $1.tipo;
+    $$.pos = creaVarTemp();
+    emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
   }
 
   | ID_ operadorAsignacion expresion
@@ -181,6 +200,8 @@ expresion:
                (sim.tipo == $3.tipo)) && ($3.tipo != T_ERROR))
       yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
+    
+    emite(EASIG, crArgPos($3.pos), crArgNul(), crArgPos(sim.desp));
   }
 
   | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion
@@ -193,6 +214,8 @@ expresion:
                (sim.telem == $6.tipo)) && ($3.tipo != T_ERROR))
 	  yyerror("Error de tipos en la 'asignacion'");
 	else $$.tipo = sim.telem;
+    
+    emite(EVA, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($6.pos));
   };
 /************************************************************************/
 
@@ -200,6 +223,8 @@ expresion:
 expresionLogica:
 	expresionIgualdad
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
   | expresionLogica operadorLogico expresionIgualdad
   { $$.tipo = T_ERROR;
@@ -207,6 +232,9 @@ expresionLogica:
         yyerror("Los tipos no son 'T_LOGICO'");
     else
         $$.tipo = $1.tipo;
+
+    $$.pos = creaVarTemp();
+    
   };
 /************************************************************************/
 
@@ -231,7 +259,7 @@ expresionRelacional:
 	expresionAditiva
     { $$.tipo = $1.tipo;
     }
-  | expresionRelacional operadorRelacional expresionAditiva
+  | expresionRelaci#define onal operadorRelacional expresionAditiva
   { $$.tipo = T_ERROR;
     if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
         yyerror("Los tipos deben ser enteros para comparar");
@@ -335,20 +363,21 @@ expresionSufija:
 
 /************************************************************************/
 operadorAsignacion:
-	IGUAL_
-  | MASIGUAL_
+    IGUAL_
+  | MASIGUA#define L_
   | MENOSIGUAL_;
 /************************************************************************/
 
 /************************************************************************/
 operadorLogico:
-	ANDAND_
+    ANDAND_
+    { $$ = asdfasdf; }
   | OROR_;
 /************************************************************************/
 
 /************************************************************************/
 operadorIgualdad:
-	IGUALIGUAL_
+    IGUALIGUAL_
   | DIFERENTE_;
 /************************************************************************/
 
