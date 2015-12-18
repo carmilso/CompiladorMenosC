@@ -57,7 +57,6 @@
 
 
 %type <tip> tipoSimple
-%type <tip> operadorUnario
 
 %type <expr> expresion 
 %type <expr> expresionLogica 
@@ -75,7 +74,7 @@
 %type <cte> operadorAditivo
 %type <cte> operadorMultiplicativo
 %type <cte> operadorUnario
-%type <cte> operadorIncrmento
+%type <cte> operadorIncremento
 
 %%
 
@@ -168,7 +167,7 @@ instruccionSeleccion:
 	IF_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_
 	{ if ($3.tipo != T_ERROR && $3.tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
 	  $<cte>$ = creaLans(si);
-	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgPos($<cte>$));
+	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgEtq($<cte>$));
 	}
 	instruccion
 	{ completaLans($<cte>5, crArgPos(si));
@@ -181,16 +180,16 @@ instruccionIteracion:
 	WHILE_
 	{ 
           $<cte>$ = si;
-       	}
+    }
 	ABREPARENTESIS_ expresion CIERRAPARENTESIS_
 	{
-	  if ($3.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
+	  if ($4.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
 	  $<cte>$ = creaLans(si);
-	  emite(EIGUAL, crArgPos($4.pos), crArgEnt(0), crArgPos($<cte>$));
+	  emite(EIGUAL, crArgPos($4.pos), crArgEnt(0), crArgEtq($<cte>$));
 	}
 	instruccion
 	{
-	  emite(GOTOS, crArgNul(), crArgNul(), crArgPos($<cte>2));
+	  emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($<cte>2));
 	  completaLans($<cte>5, crArgPos(si));
 	}
 	;
@@ -247,7 +246,16 @@ expresionLogica:
         $$.tipo = $1.tipo;
 
     $$.pos = creaVarTemp();
-    
+    if ($2 == OPANDAND)
+	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
+	  emite(EIGUAL, crArgPos($1.pos), crArgEnt(0), crArgEtq(si+3));
+	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgEtq(si+2));
+	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
+    else if ($2 == OPOROR)
+	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
+	  emite(EIGUAL, crArgPos($1.pos), crArgEnt(1), crArgEtq(si+3));
+	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(1), crArgEtq(si+2));
+	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -255,6 +263,8 @@ expresionLogica:
 expresionIgualdad:
 	expresionRelacional
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
   | expresionIgualdad operadorIgualdad expresionRelacional
   { $$.tipo = T_ERROR;
@@ -264,6 +274,16 @@ expresionIgualdad:
         yyerror("Las expresiones no son del mismo tipo o no son validas");
     else
         $$.tipo = T_LOGICO;
+        
+	$$.pos = creaVarTemp();
+	emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
+	
+	if ($2 == OPIGIG)
+	  emite(EIGUAL, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	else
+	  emite(EDIST, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	
+	emite(EASIG, crArgEt(0), crArgNul(), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -271,13 +291,29 @@ expresionIgualdad:
 expresionRelacional:
 	expresionAditiva
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
-  | expresionRelaci#define onal operadorRelacional expresionAditiva
+  | expresionRelacional operadorRelacional expresionAditiva
   { $$.tipo = T_ERROR;
     if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
         yyerror("Los tipos deben ser enteros para comparar");
     else
         $$.tipo = T_LOGICO;
+        
+	$$.pos = creaVarTemp();
+	emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
+	
+	if ($2 == OPMAYOR)
+	  emite(EMAY, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	else if ($2 == OPMENOR)
+	  emite(EMEN, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	else if ($2 == OPMAYIG)
+	  emite(EMAYEQ, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	else
+	  emite(EMENEQ, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
+	
+	emite(EASIG, crArgEt(0), crArgNul(), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -285,6 +321,8 @@ expresionRelacional:
 expresionAditiva:
 	expresionMultiplicativa
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
   | expresionAditiva operadorAditivo expresionMultiplicativa
   { $$.tipo = T_ERROR;
@@ -292,6 +330,12 @@ expresionAditiva:
         yyerror("Los tipos deben ser enteros para operar");
     else
         $$.tipo = T_ENTERO;
+        
+	$$.pos = creaVarTemp();
+	if ($2 == OPSUMA)
+	  emite(ESUM, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	else
+	  emite(EDIF, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
   };
 /************************************************************************/
 
@@ -299,6 +343,8 @@ expresionAditiva:
 expresionMultiplicativa:
 	expresionUnaria
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
   | expresionMultiplicativa operadorMultiplicativo expresionUnaria
   { $$.tipo = T_ERROR;
@@ -306,6 +352,12 @@ expresionMultiplicativa:
         yyerror("Los tipos deben ser enteros para operar");
     else
         $$.tipo = T_ENTERO;
+        
+	$$.pos = creaVarTemp();
+	if ($2 == OPMULT)
+	  emite(EMULT, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	else
+	  emite(EDIVI, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
   };
 /************************************************************************/
 
@@ -313,13 +365,29 @@ expresionMultiplicativa:
 expresionUnaria:
 	expresionSufija
     { $$.tipo = $1.tipo;
+      $$.pos = creaVarTemp();
+      emite(EASIG, crArgPos($1.pos), crArgNul(), crArgPos($$.pos));
     }
   | operadorUnario expresionUnaria
   { $$.tipo = T_ERROR;
-    if ($1 != $2.tipo)
+    int t_op = T_ENTERO;
+    if ($1 == OPNOT)
+	  t_op = T_LOGICO;
+    if (t_op != $2.tipo)
         yyerror("Esta operacion no es valida para este tipo");
     else
         $$.tipo = $2.tipo;
+        
+	$$.pos = creaVarTemp();
+	if ($1 == OPPOS)
+      emite(EASIG, crArgPos($2.pos), crArgNul(), crArgPos($$.pos));
+	else if ($1 == OPNEG)
+	  emite(EDIF, crArgEnt(0), crArgPos($2.pos), crArgPos($$.pos);
+	else {
+	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
+	  emite(EIGUAL, crArgPos($2), crArgEnt(0), crArgEtq(si+2));
+	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
+	}
   }
   | operadorIncremento ID_
   { $$.tipo = T_ERROR;
@@ -330,6 +398,14 @@ expresionUnaria:
         yyerror("Esta operacion no es valida para este tipo");
     else
         $$.tipo = T_ENTERO;
+        
+	$$.pos = creaVarTemp();
+	if ($1 == OPMASMAS)
+      emite(ESUM, crArgPos(sim.desp), crArgEnt(1), crArgPos($$.pos));
+	else
+	  emite(EDIF, crArgPos(sim.desp), crArgEnt(1), crArgPos($$.pos));
+	  
+	emite(EASIG, crArgPos($$.pos), crArgNul(), crArgPos(sim.desp));
   };
 /************************************************************************/
 
@@ -344,9 +420,14 @@ expresionSufija:
           yyerror("El indice debe ser entero");
       else
           $$.tipo = sim.telem;
+      
+	  $$ = creaVarTemp();
+	  emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
     }
   | ABREPARENTESIS_ expresion CIERRAPARENTESIS_
   { $$.tipo = $2.tipo;
+    $$.pos = creaVarTemp();
+    emite(EASIG, crArgPos($2.pos), crArgNul(), crArgPos($$.pos));
   }
   | ID_
   { $$.tipo = T_ERROR;
@@ -355,6 +436,9 @@ expresionSufija:
         yyerror("El identificador no esta declarado");
     else
         $$.tipo = sim.tipo;
+        
+	$$.pos = creaVarTemp();
+	emite(EASIG, crArgPos(sim.desp), crArgNul(), crArgPos($$.pos));
   }
   | ID_ operadorIncremento
   { $$.tipo = T_ERROR;
@@ -365,6 +449,13 @@ expresionSufija:
         yyerror("La variable debe ser entera");
     else
         $$.tipo = sim.tipo;
+        
+	$$.pos = creaVarTemp();
+	emite(EASIG, crArgPos($$.pos), crArgNul(), crArgPos(sim.desp));
+	if ($1 == OPMASMAS)
+      emite(ESUM, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
+	else
+	  emite(EDIF, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
   }
   | CTE_
   { $$.tipo = T_ENTERO; }
@@ -377,57 +468,73 @@ expresionSufija:
 /************************************************************************/
 operadorAsignacion:
     IGUAL_
-  | MASIGUA#define L_
-  | MENOSIGUAL_;
+  { $$ = OPIGUAL; }
+  | MASIGUAL_
+  { $$ = OPMASIG; }
+  | MENOSIGUAL_
+  { $$ = OPMENIG; };
 /************************************************************************/
 
 /************************************************************************/
 operadorLogico:
     ANDAND_
-    { $$ = asdfasdf; }
-  | OROR_;
+  { $$ = OPANDAND; }
+  | OROR_
+  { $$ = OPOROR; };
 /************************************************************************/
 
 /************************************************************************/
 operadorIgualdad:
     IGUALIGUAL_
-  | DIFERENTE_;
+  { $$ = OPIGIG; }
+  | DIFERENTE_
+  { $$ = OPNOTIG; };
 /************************************************************************/
 
 /************************************************************************/
 operadorRelacional:
     MAYORQ_
+  { $$ = OPMAYOR; }
   | MENORQ_
+  { $$ = OPMENOR; }
   | MAYORIG_
-  | MENORIG_;
+  { $$ = OPMAYIG; }
+  | MENORIG_
+  { $$ = OPMENIG; };
 /************************************************************************/
 
 /************************************************************************/
 operadorAditivo:
 	MAS_
-  | MENOS_;
+  { $$ = OPSUMA; }
+  | MENOS_
+  { $$ = OPRESTA; };
 /************************************************************************/
 
 /************************************************************************/
 operadorMultiplicativo:
     POR_
-  | ENTRE_;
+  { $$ = OPMULT; }
+  | ENTRE_
+  { $$ = OPDIV; };
 /************************************************************************/
 
 /************************************************************************/
 operadorUnario:
     MAS_
-    { $$ = T_ENTERO; }
+  { $$ = OPPOS; }
   | MENOS_
-  { $$ = T_ENTERO; }
+  { $$ = OPNEG; }
   | NEG_
-  { $$ = T_LOGICO; };
+  { $$ = OPNOT; };
 /************************************************************************/
 
 /************************************************************************/
 operadorIncremento:
     MASMAS_
-  | MENOSMENOS_;
+  { $$ = OPMASMAS; }
+  | MENOSMENOS_
+  { $$ = OPMENMEN; };
 /************************************************************************/
 
 

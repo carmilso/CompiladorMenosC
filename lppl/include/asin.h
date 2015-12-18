@@ -91,16 +91,19 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 8 "src/asin.y"
+#line 19 "src/asin.y"
 
   char *id;
   int cte;
   int tip;
-  EXPR expre; /*para los no terminales expresion*/
+  struct {
+    int tipo;
+    int pos;
+  } expr; /*para los no terminales expresion*/
 
 
 /* Line 2058 of yacc.c  */
-#line 104 "asin.h"
+#line 107 "asin.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
