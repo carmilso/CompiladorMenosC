@@ -12,6 +12,7 @@
 #include "libtds.h"
 #include "libgci.h"
 #include "header.h"
+#include "headops.h"
 %}
 
 
@@ -185,12 +186,12 @@ instruccionIteracion:
 	{
 	  if ($4.tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
 	  $<cte>$ = creaLans(si);
-	  emite(EIGUAL, crArgPos($4.pos), crArgEnt(0), crArgEtq($<cte>$));
+	  emite(EIGUAL, crArgPos($4.pos), crArgEnt(0), $<cte>$);
 	}
 	instruccion
 	{
-	  emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($<cte>2));
-	  completaLans($<cte>5, crArgPos(si));
+	  emite(GOTOS, crArgNul(), crArgNul(), $<cte>2);
+	  completaLans($<cte>5, crArgEtq(si));
 	}
 	;
 
@@ -213,7 +214,12 @@ expresion:
       yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
     
-    emite(EASIG, crArgPos($3.pos), crArgNul(), crArgPos(sim.desp));
+    if ($2 == OPIGUAL)
+      emite(EASIG, crArgPos($3.pos), crArgNul(), crArgPos(sim.desp));
+    else if ($2 == OPSUMIG)
+      emite(ESUM, crArgPos(sim.desp), crArgPos($3.pos), crArgPos(sim.desp));
+    else
+      emite(EDIF, crArgPos(sim.desp), crArgPos($3.pos), crArgPos(sim.desp));
   }
 
   | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion
@@ -246,16 +252,18 @@ expresionLogica:
         $$.tipo = $1.tipo;
 
     $$.pos = creaVarTemp();
-    if ($2 == OPANDAND)
+    if ($2 == OPANDAND) {
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
 	  emite(EIGUAL, crArgPos($1.pos), crArgEnt(0), crArgEtq(si+3));
 	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(0), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
-    else if ($2 == OPOROR)
+	}
+    else {
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
 	  emite(EIGUAL, crArgPos($1.pos), crArgEnt(1), crArgEtq(si+3));
 	  emite(EIGUAL, crArgPos($3.pos), crArgEnt(1), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
+	}
   };
 /************************************************************************/
 
@@ -283,7 +291,7 @@ expresionIgualdad:
 	else
 	  emite(EDIST, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
 	
-	emite(EASIG, crArgEt(0), crArgNul(), crArgPos($$.pos));
+	emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -313,7 +321,7 @@ expresionRelacional:
 	else
 	  emite(EMENEQ, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si+2));
 	
-	emite(EASIG, crArgEt(0), crArgNul(), crArgPos($$.pos));
+	emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -333,9 +341,9 @@ expresionAditiva:
         
 	$$.pos = creaVarTemp();
 	if ($2 == OPSUMA)
-	  emite(ESUM, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	  emite(ESUM, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
 	else
-	  emite(EDIF, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	  emite(EDIF, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -355,9 +363,9 @@ expresionMultiplicativa:
         
 	$$.pos = creaVarTemp();
 	if ($2 == OPMULT)
-	  emite(EMULT, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	  emite(EMULT, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
 	else
-	  emite(EDIVI, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos);
+	  emite(EDIVI, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
   };
 /************************************************************************/
 
@@ -382,10 +390,10 @@ expresionUnaria:
 	if ($1 == OPPOS)
       emite(EASIG, crArgPos($2.pos), crArgNul(), crArgPos($$.pos));
 	else if ($1 == OPNEG)
-	  emite(EDIF, crArgEnt(0), crArgPos($2.pos), crArgPos($$.pos);
+	  emite(EDIF, crArgEnt(0), crArgPos($2.pos), crArgPos($$.pos));
 	else {
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
-	  emite(EIGUAL, crArgPos($2), crArgEnt(0), crArgEtq(si+2));
+	  emite(EIGUAL, crArgPos($2.pos), crArgEnt(0), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
 	}
   }
@@ -421,7 +429,7 @@ expresionSufija:
       else
           $$.tipo = sim.telem;
       
-	  $$ = creaVarTemp();
+	  $$.pos = creaVarTemp();
 	  emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
     }
   | ABREPARENTESIS_ expresion CIERRAPARENTESIS_
@@ -452,7 +460,7 @@ expresionSufija:
         
 	$$.pos = creaVarTemp();
 	emite(EASIG, crArgPos($$.pos), crArgNul(), crArgPos(sim.desp));
-	if ($1 == OPMASMAS)
+	if ($2 == OPMASMAS)
       emite(ESUM, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
 	else
 	  emite(EDIF, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
@@ -470,9 +478,9 @@ operadorAsignacion:
     IGUAL_
   { $$ = OPIGUAL; }
   | MASIGUAL_
-  { $$ = OPMASIG; }
+  { $$ = OPSUMIG; }
   | MENOSIGUAL_
-  { $$ = OPMENIG; };
+  { $$ = OPRESIG; };
 /************************************************************************/
 
 /************************************************************************/
@@ -537,5 +545,3 @@ operadorIncremento:
   { $$ = OPMENMEN; };
 /************************************************************************/
 
-
-%%

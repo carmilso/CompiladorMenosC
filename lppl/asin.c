@@ -69,9 +69,10 @@
 #include "libtds.h"
 #include "libgci.h"
 #include "header.h"
+#include "headops.h"
 
 /* Line 371 of yacc.c  */
-#line 75 "asin.c"
+#line 76 "asin.c"
 
 # ifndef YY_NULL
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -152,7 +153,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 387 of yacc.c  */
-#line 19 "src/asin.y"
+#line 20 "src/asin.y"
 
   char *id;
   int cte;
@@ -164,7 +165,7 @@ typedef union YYSTYPE
 
 
 /* Line 387 of yacc.c  */
-#line 168 "asin.c"
+#line 169 "asin.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -192,7 +193,7 @@ int yyparse ();
 /* Copy the second part of user declarations.  */
 
 /* Line 390 of yacc.c  */
-#line 196 "asin.c"
+#line 197 "asin.c"
 
 #ifdef short
 # undef short
@@ -508,14 +509,14 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    83,    83,    86,    91,    92,    97,    98,   103,   112,
-     127,   129,   135,   136,   137,   138,   139,   143,   144,   149,
-     150,   155,   160,   168,   173,   167,   181,   185,   180,   201,
-     207,   219,   236,   241,   264,   269,   292,   297,   322,   327,
-     344,   349,   366,   371,   392,   414,   427,   432,   443,   460,
-     462,   464,   470,   472,   474,   480,   482,   488,   490,   496,
-     498,   500,   502,   508,   510,   516,   518,   524,   526,   528,
-     534,   536
+       0,    84,    84,    87,    92,    93,    98,    99,   104,   113,
+     128,   130,   136,   137,   138,   139,   140,   144,   145,   150,
+     151,   156,   161,   169,   174,   168,   182,   186,   181,   202,
+     208,   225,   242,   247,   272,   277,   300,   305,   330,   335,
+     352,   357,   374,   379,   400,   422,   435,   440,   451,   468,
+     470,   472,   478,   480,   482,   488,   490,   496,   498,   504,
+     506,   508,   510,   516,   518,   524,   526,   532,   534,   536,
+     542,   544
 };
 #endif
 
@@ -1513,14 +1514,14 @@ yyreduce:
     {
         case 2:
 /* Line 1792 of yacc.c  */
-#line 84 "src/asin.y"
+#line 85 "src/asin.y"
     { if (flagMostrarTDS) mostrarTDS();
       }
     break;
 
   case 8:
 /* Line 1792 of yacc.c  */
-#line 105 "src/asin.y"
+#line 106 "src/asin.y"
     {
 	  if (!insertarTSimpleTDS((yyvsp[(2) - (3)].id), (yyvsp[(1) - (3)].tip), dvar))
 	    yyerror("Identificador repetido");
@@ -1531,7 +1532,7 @@ yyreduce:
 
   case 9:
 /* Line 1792 of yacc.c  */
-#line 113 "src/asin.y"
+#line 114 "src/asin.y"
     { int numelem = (yyvsp[(4) - (6)].cte);
     if ((yyvsp[(4) - (6)].cte) <= 0) {
       yyerror("Talla inapropiada del array");
@@ -1546,19 +1547,19 @@ yyreduce:
 
   case 10:
 /* Line 1792 of yacc.c  */
-#line 128 "src/asin.y"
+#line 129 "src/asin.y"
     { (yyval.tip) = T_ENTERO; }
     break;
 
   case 11:
 /* Line 1792 of yacc.c  */
-#line 130 "src/asin.y"
+#line 131 "src/asin.y"
     { (yyval.tip) = T_LOGICO; }
     break;
 
   case 21:
 /* Line 1792 of yacc.c  */
-#line 156 "src/asin.y"
+#line 157 "src/asin.y"
     { SIMB sim = obtenerTDS((yyvsp[(3) - (5)].id));
 	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
 	  else emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
@@ -1567,14 +1568,14 @@ yyreduce:
 
   case 22:
 /* Line 1792 of yacc.c  */
-#line 161 "src/asin.y"
+#line 162 "src/asin.y"
     { emite(EWRITE, crArgNul(), crArgNul(), crArgPos((yyvsp[(3) - (5)].expr).pos));
   }
     break;
 
   case 23:
 /* Line 1792 of yacc.c  */
-#line 168 "src/asin.y"
+#line 169 "src/asin.y"
     { if ((yyvsp[(3) - (4)].expr).tipo != T_ERROR && (yyvsp[(3) - (4)].expr).tipo != T_LOGICO) yyerror("La expresion en IF no es de tipo logico");
 	  (yyval.cte) = creaLans(si);
 	  emite(EIGUAL, crArgPos((yyvsp[(3) - (4)].expr).pos), crArgEnt(0), crArgEtq((yyval.cte)));
@@ -1583,14 +1584,14 @@ yyreduce:
 
   case 24:
 /* Line 1792 of yacc.c  */
-#line 173 "src/asin.y"
+#line 174 "src/asin.y"
     { completaLans((yyvsp[(5) - (6)].cte), crArgPos(si));
 	}
     break;
 
   case 26:
 /* Line 1792 of yacc.c  */
-#line 181 "src/asin.y"
+#line 182 "src/asin.y"
     { 
           (yyval.cte) = si;
     }
@@ -1598,26 +1599,26 @@ yyreduce:
 
   case 27:
 /* Line 1792 of yacc.c  */
-#line 185 "src/asin.y"
+#line 186 "src/asin.y"
     {
 	  if ((yyvsp[(4) - (5)].expr).tipo != T_LOGICO) yyerror("La expresion en WHILE no es de tipo logico");
 	  (yyval.cte) = creaLans(si);
-	  emite(EIGUAL, crArgPos((yyvsp[(4) - (5)].expr).pos), crArgEnt(0), crArgEtq((yyval.cte)));
+	  emite(EIGUAL, crArgPos((yyvsp[(4) - (5)].expr).pos), crArgEnt(0), (yyval.cte));
 	}
     break;
 
   case 28:
 /* Line 1792 of yacc.c  */
-#line 191 "src/asin.y"
+#line 192 "src/asin.y"
     {
-	  emite(GOTOS, crArgNul(), crArgNul(), crArgEtq((yyvsp[(2) - (7)].cte)));
-	  completaLans((yyvsp[(5) - (7)].cte), crArgPos(si));
+	  emite(GOTOS, crArgNul(), crArgNul(), (yyvsp[(2) - (7)].cte));
+	  completaLans((yyvsp[(5) - (7)].cte), crArgEtq(si));
 	}
     break;
 
   case 29:
 /* Line 1792 of yacc.c  */
-#line 202 "src/asin.y"
+#line 203 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
     (yyval.expr).pos = creaVarTemp();
     emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1626,7 +1627,7 @@ yyreduce:
 
   case 30:
 /* Line 1792 of yacc.c  */
-#line 208 "src/asin.y"
+#line 209 "src/asin.y"
     { SIMB sim = obtenerTDS((yyvsp[(1) - (3)].id)); (yyval.expr).tipo = T_ERROR;
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
     else if (!((((yyvsp[(3) - (3)].expr).tipo == T_ENTERO) || ((yyvsp[(3) - (3)].expr).tipo == T_LOGICO)) &&
@@ -1635,13 +1636,18 @@ yyreduce:
       yyerror("Error de tipos en la 'asignacion'");
     else (yyval.expr).tipo = sim.tipo;
     
-    emite(EASIG, crArgPos((yyvsp[(3) - (3)].expr).pos), crArgNul(), crArgPos(sim.desp));
+    if ((yyvsp[(2) - (3)].cte) == OPIGUAL)
+      emite(EASIG, crArgPos((yyvsp[(3) - (3)].expr).pos), crArgNul(), crArgPos(sim.desp));
+    else if ((yyvsp[(2) - (3)].cte) == OPSUMIG)
+      emite(ESUM, crArgPos(sim.desp), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos(sim.desp));
+    else
+      emite(EDIF, crArgPos(sim.desp), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos(sim.desp));
   }
     break;
 
   case 31:
 /* Line 1792 of yacc.c  */
-#line 220 "src/asin.y"
+#line 226 "src/asin.y"
     { SIMB sim = obtenerTDS((yyvsp[(1) - (6)].id)); (yyval.expr).tipo = T_ERROR;
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
     else if ((yyvsp[(3) - (6)].expr).tipo != T_ENTERO) yyerror("Indice no entero");
@@ -1658,7 +1664,7 @@ yyreduce:
 
   case 32:
 /* Line 1792 of yacc.c  */
-#line 237 "src/asin.y"
+#line 243 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1667,7 +1673,7 @@ yyreduce:
 
   case 33:
 /* Line 1792 of yacc.c  */
-#line 242 "src/asin.y"
+#line 248 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     if ((yyvsp[(1) - (3)].expr).tipo != T_LOGICO || (yyvsp[(3) - (3)].expr).tipo != T_LOGICO)
         yyerror("Los tipos no son 'T_LOGICO'");
@@ -1675,22 +1681,24 @@ yyreduce:
         (yyval.expr).tipo = (yyvsp[(1) - (3)].expr).tipo;
 
     (yyval.expr).pos = creaVarTemp();
-    if ((yyvsp[(2) - (3)].cte) == OPANDAND)
+    if ((yyvsp[(2) - (3)].cte) == OPANDAND) {
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos((yyval.expr).pos));
 	  emite(EIGUAL, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgEnt(0), crArgEtq(si+3));
 	  emite(EIGUAL, crArgPos((yyvsp[(3) - (3)].expr).pos), crArgEnt(0), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos((yyval.expr).pos));
-    else if ((yyvsp[(2) - (3)].cte) == OPOROR)
+	}
+    else {
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos((yyval.expr).pos));
 	  emite(EIGUAL, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgEnt(1), crArgEtq(si+3));
 	  emite(EIGUAL, crArgPos((yyvsp[(3) - (3)].expr).pos), crArgEnt(1), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos((yyval.expr).pos));
+	}
   }
     break;
 
   case 34:
 /* Line 1792 of yacc.c  */
-#line 265 "src/asin.y"
+#line 273 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1699,7 +1707,7 @@ yyreduce:
 
   case 35:
 /* Line 1792 of yacc.c  */
-#line 270 "src/asin.y"
+#line 278 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     if (!((((yyvsp[(1) - (3)].expr).tipo == T_ENTERO) || ((yyvsp[(1) - (3)].expr).tipo == T_LOGICO)) &&
         (((yyvsp[(3) - (3)].expr).tipo == T_ENTERO) || ((yyvsp[(3) - (3)].expr).tipo == T_LOGICO)) &&
@@ -1716,13 +1724,13 @@ yyreduce:
 	else
 	  emite(EDIST, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgEtq(si+2));
 	
-	emite(EASIG, crArgEt(0), crArgNul(), crArgPos((yyval.expr).pos));
+	emite(EASIG, crArgEnt(0), crArgNul(), crArgPos((yyval.expr).pos));
   }
     break;
 
   case 36:
 /* Line 1792 of yacc.c  */
-#line 293 "src/asin.y"
+#line 301 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1731,7 +1739,7 @@ yyreduce:
 
   case 37:
 /* Line 1792 of yacc.c  */
-#line 298 "src/asin.y"
+#line 306 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     if (!((yyvsp[(1) - (3)].expr).tipo == T_ENTERO && (yyvsp[(3) - (3)].expr).tipo == T_ENTERO))
         yyerror("Los tipos deben ser enteros para comparar");
@@ -1750,13 +1758,13 @@ yyreduce:
 	else
 	  emite(EMENEQ, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgEtq(si+2));
 	
-	emite(EASIG, crArgEt(0), crArgNul(), crArgPos((yyval.expr).pos));
+	emite(EASIG, crArgEnt(0), crArgNul(), crArgPos((yyval.expr).pos));
   }
     break;
 
   case 38:
 /* Line 1792 of yacc.c  */
-#line 323 "src/asin.y"
+#line 331 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1765,7 +1773,7 @@ yyreduce:
 
   case 39:
 /* Line 1792 of yacc.c  */
-#line 328 "src/asin.y"
+#line 336 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     if (!((yyvsp[(1) - (3)].expr).tipo == T_ENTERO && (yyvsp[(3) - (3)].expr).tipo == T_ENTERO))
         yyerror("Los tipos deben ser enteros para operar");
@@ -1774,15 +1782,15 @@ yyreduce:
         
 	(yyval.expr).pos = creaVarTemp();
 	if ((yyvsp[(2) - (3)].cte) == OPSUMA)
-	  emite(ESUM, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos);
+	  emite(ESUM, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos));
 	else
-	  emite(EDIF, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos);
+	  emite(EDIF, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos));
   }
     break;
 
   case 40:
 /* Line 1792 of yacc.c  */
-#line 345 "src/asin.y"
+#line 353 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1791,7 +1799,7 @@ yyreduce:
 
   case 41:
 /* Line 1792 of yacc.c  */
-#line 350 "src/asin.y"
+#line 358 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     if (!((yyvsp[(1) - (3)].expr).tipo == T_ENTERO && (yyvsp[(3) - (3)].expr).tipo == T_ENTERO))
         yyerror("Los tipos deben ser enteros para operar");
@@ -1800,15 +1808,15 @@ yyreduce:
         
 	(yyval.expr).pos = creaVarTemp();
 	if ((yyvsp[(2) - (3)].cte) == OPMULT)
-	  emite(EMULT, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos);
+	  emite(EMULT, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos));
 	else
-	  emite(EDIVI, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos);
+	  emite(EDIVI, crArgPos((yyvsp[(1) - (3)].expr).pos), crArgPos((yyvsp[(3) - (3)].expr).pos), crArgPos((yyval.expr).pos));
   }
     break;
 
   case 42:
 /* Line 1792 of yacc.c  */
-#line 367 "src/asin.y"
+#line 375 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(1) - (1)].expr).tipo;
       (yyval.expr).pos = creaVarTemp();
       emite(EASIG, crArgPos((yyvsp[(1) - (1)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1817,7 +1825,7 @@ yyreduce:
 
   case 43:
 /* Line 1792 of yacc.c  */
-#line 372 "src/asin.y"
+#line 380 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     int t_op = T_ENTERO;
     if ((yyvsp[(1) - (2)].cte) == OPNOT)
@@ -1831,10 +1839,10 @@ yyreduce:
 	if ((yyvsp[(1) - (2)].cte) == OPPOS)
       emite(EASIG, crArgPos((yyvsp[(2) - (2)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
 	else if ((yyvsp[(1) - (2)].cte) == OPNEG)
-	  emite(EDIF, crArgEnt(0), crArgPos((yyvsp[(2) - (2)].expr).pos), crArgPos((yyval.expr).pos);
+	  emite(EDIF, crArgEnt(0), crArgPos((yyvsp[(2) - (2)].expr).pos), crArgPos((yyval.expr).pos));
 	else {
 	  emite(EASIG, crArgEnt(1), crArgNul(), crArgPos((yyval.expr).pos));
-	  emite(EIGUAL, crArgPos((yyvsp[(2) - (2)].expr)), crArgEnt(0), crArgEtq(si+2));
+	  emite(EIGUAL, crArgPos((yyvsp[(2) - (2)].expr).pos), crArgEnt(0), crArgEtq(si+2));
 	  emite(EASIG, crArgEnt(0), crArgNul(), crArgPos((yyval.expr).pos));
 	}
   }
@@ -1842,7 +1850,7 @@ yyreduce:
 
   case 44:
 /* Line 1792 of yacc.c  */
-#line 393 "src/asin.y"
+#line 401 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     SIMB sim = obtenerTDS((yyvsp[(2) - (2)].id));
     if (sim.tipo == T_ERROR)
@@ -1864,7 +1872,7 @@ yyreduce:
 
   case 45:
 /* Line 1792 of yacc.c  */
-#line 415 "src/asin.y"
+#line 423 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
       SIMB sim = obtenerTDS((yyvsp[(1) - (4)].id));
       if (sim.tipo == T_ERROR)
@@ -1874,14 +1882,14 @@ yyreduce:
       else
           (yyval.expr).tipo = sim.telem;
       
-	  (yyval.expr) = creaVarTemp();
+	  (yyval.expr).pos = creaVarTemp();
 	  emite(EAV, crArgPos(sim.desp), crArgPos((yyvsp[(3) - (4)].expr).pos), crArgPos((yyval.expr).pos));
     }
     break;
 
   case 46:
 /* Line 1792 of yacc.c  */
-#line 428 "src/asin.y"
+#line 436 "src/asin.y"
     { (yyval.expr).tipo = (yyvsp[(2) - (3)].expr).tipo;
     (yyval.expr).pos = creaVarTemp();
     emite(EASIG, crArgPos((yyvsp[(2) - (3)].expr).pos), crArgNul(), crArgPos((yyval.expr).pos));
@@ -1890,7 +1898,7 @@ yyreduce:
 
   case 47:
 /* Line 1792 of yacc.c  */
-#line 433 "src/asin.y"
+#line 441 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     SIMB sim = obtenerTDS((yyvsp[(1) - (1)].id));
     if (sim.tipo == T_ERROR)
@@ -1905,7 +1913,7 @@ yyreduce:
 
   case 48:
 /* Line 1792 of yacc.c  */
-#line 444 "src/asin.y"
+#line 452 "src/asin.y"
     { (yyval.expr).tipo = T_ERROR;
     SIMB sim = obtenerTDS((yyvsp[(1) - (2)].id));
     if (sim.tipo == T_ERROR)
@@ -1917,7 +1925,7 @@ yyreduce:
         
 	(yyval.expr).pos = creaVarTemp();
 	emite(EASIG, crArgPos((yyval.expr).pos), crArgNul(), crArgPos(sim.desp));
-	if ((yyvsp[(1) - (2)].id) == OPMASMAS)
+	if ((yyvsp[(2) - (2)].cte) == OPMASMAS)
       emite(ESUM, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
 	else
 	  emite(EDIF, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
@@ -1926,145 +1934,145 @@ yyreduce:
 
   case 49:
 /* Line 1792 of yacc.c  */
-#line 461 "src/asin.y"
+#line 469 "src/asin.y"
     { (yyval.expr).tipo = T_ENTERO; }
     break;
 
   case 50:
 /* Line 1792 of yacc.c  */
-#line 463 "src/asin.y"
+#line 471 "src/asin.y"
     { (yyval.expr).tipo = T_LOGICO; }
     break;
 
   case 51:
 /* Line 1792 of yacc.c  */
-#line 465 "src/asin.y"
+#line 473 "src/asin.y"
     { (yyval.expr).tipo = T_LOGICO; }
     break;
 
   case 52:
 /* Line 1792 of yacc.c  */
-#line 471 "src/asin.y"
+#line 479 "src/asin.y"
     { (yyval.cte) = OPIGUAL; }
     break;
 
   case 53:
 /* Line 1792 of yacc.c  */
-#line 473 "src/asin.y"
-    { (yyval.cte) = OPMASIG; }
+#line 481 "src/asin.y"
+    { (yyval.cte) = OPSUMIG; }
     break;
 
   case 54:
 /* Line 1792 of yacc.c  */
-#line 475 "src/asin.y"
-    { (yyval.cte) = OPMENIG; }
+#line 483 "src/asin.y"
+    { (yyval.cte) = OPRESIG; }
     break;
 
   case 55:
 /* Line 1792 of yacc.c  */
-#line 481 "src/asin.y"
+#line 489 "src/asin.y"
     { (yyval.cte) = OPANDAND; }
     break;
 
   case 56:
 /* Line 1792 of yacc.c  */
-#line 483 "src/asin.y"
+#line 491 "src/asin.y"
     { (yyval.cte) = OPOROR; }
     break;
 
   case 57:
 /* Line 1792 of yacc.c  */
-#line 489 "src/asin.y"
+#line 497 "src/asin.y"
     { (yyval.cte) = OPIGIG; }
     break;
 
   case 58:
 /* Line 1792 of yacc.c  */
-#line 491 "src/asin.y"
+#line 499 "src/asin.y"
     { (yyval.cte) = OPNOTIG; }
     break;
 
   case 59:
 /* Line 1792 of yacc.c  */
-#line 497 "src/asin.y"
+#line 505 "src/asin.y"
     { (yyval.cte) = OPMAYOR; }
     break;
 
   case 60:
 /* Line 1792 of yacc.c  */
-#line 499 "src/asin.y"
+#line 507 "src/asin.y"
     { (yyval.cte) = OPMENOR; }
     break;
 
   case 61:
 /* Line 1792 of yacc.c  */
-#line 501 "src/asin.y"
+#line 509 "src/asin.y"
     { (yyval.cte) = OPMAYIG; }
     break;
 
   case 62:
 /* Line 1792 of yacc.c  */
-#line 503 "src/asin.y"
+#line 511 "src/asin.y"
     { (yyval.cte) = OPMENIG; }
     break;
 
   case 63:
 /* Line 1792 of yacc.c  */
-#line 509 "src/asin.y"
+#line 517 "src/asin.y"
     { (yyval.cte) = OPSUMA; }
     break;
 
   case 64:
 /* Line 1792 of yacc.c  */
-#line 511 "src/asin.y"
+#line 519 "src/asin.y"
     { (yyval.cte) = OPRESTA; }
     break;
 
   case 65:
 /* Line 1792 of yacc.c  */
-#line 517 "src/asin.y"
+#line 525 "src/asin.y"
     { (yyval.cte) = OPMULT; }
     break;
 
   case 66:
 /* Line 1792 of yacc.c  */
-#line 519 "src/asin.y"
+#line 527 "src/asin.y"
     { (yyval.cte) = OPDIV; }
     break;
 
   case 67:
 /* Line 1792 of yacc.c  */
-#line 525 "src/asin.y"
+#line 533 "src/asin.y"
     { (yyval.cte) = OPPOS; }
     break;
 
   case 68:
 /* Line 1792 of yacc.c  */
-#line 527 "src/asin.y"
+#line 535 "src/asin.y"
     { (yyval.cte) = OPNEG; }
     break;
 
   case 69:
 /* Line 1792 of yacc.c  */
-#line 529 "src/asin.y"
+#line 537 "src/asin.y"
     { (yyval.cte) = OPNOT; }
     break;
 
   case 70:
 /* Line 1792 of yacc.c  */
-#line 535 "src/asin.y"
+#line 543 "src/asin.y"
     { (yyval.cte) = OPMASMAS; }
     break;
 
   case 71:
 /* Line 1792 of yacc.c  */
-#line 537 "src/asin.y"
+#line 545 "src/asin.y"
     { (yyval.cte) = OPMENMEN; }
     break;
 
 
 /* Line 1792 of yacc.c  */
-#line 2068 "asin.c"
+#line 2076 "asin.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2294,7 +2302,4 @@ yyreturn:
   return YYID (yyresult);
 }
 
-
-/* Line 2055 of yacc.c  */
-#line 541 "src/asin.y"
 

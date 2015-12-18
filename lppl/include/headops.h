@@ -7,8 +7,8 @@
 /*****************************************************************************/
 
 #define OPIGUAL  0
-#define OPMASIG  1
-#define OPMENIG  2
+#define OPSUMIG  1
+#define OPRESIG  2
 #define OPANDAND 3
 #define OPOROR   4
 #define	OPIGIG   5
