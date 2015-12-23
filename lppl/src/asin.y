@@ -156,7 +156,8 @@ instruccionEntradaSalida:
 	READ_ ABREPARENTESIS_ ID_ CIERRAPARENTESIS_ PUNTOCOMA_
 	{ SIMB sim = obtenerTDS($3);
 	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
-	  else emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
+	  else
+      emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
 	}
   | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_
   { emite(EWRITE, crArgNul(), crArgNul(), crArgPos($3.pos));
@@ -219,12 +220,16 @@ expresion:
       yyerror("Error de tipos en la 'asignacion'");
     else $$.tipo = sim.tipo;
 
+    $$.pos = creaVarTemp();
+
     if ($2 == OPIGUAL)
-      emite(EASIG, crArgPos($3.pos), crArgNul(), crArgPos(sim.desp));
+      emite(EASIG, crArgPos($3.pos), crArgNul(), crArgPos($$.pos));
     else if ($2 == OPSUMIG)
-      emite(ESUM, crArgPos(sim.desp), crArgPos($3.pos), crArgPos(sim.desp));
+      emite(ESUM, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
     else
-      emite(EDIF, crArgPos(sim.desp), crArgPos($3.pos), crArgPos(sim.desp));
+      emite(EDIF, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
+
+    emite(EASIG, crArgPos($$.pos), crArgNul(), crArgPos(sim.desp));
   }
 
   | ID_ ABRECLAUDATOR_ expresion CIERRACLAUDATOR_ operadorAsignacion expresion
@@ -236,9 +241,22 @@ expresion:
               ((sim.telem == T_ENTERO) || (sim.telem == T_LOGICO)) &&
                (sim.telem == $6.tipo)) && ($3.tipo != T_ERROR))
 	  yyerror("Error de tipos en la 'asignacion'");
-	else $$.tipo = sim.telem;
+	  else $$.tipo = sim.telem;
 
-    emite(EVA, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($6.pos));
+    $$.pos = creaVarTemp();
+
+    if ($5 == OPIGUAL)
+      emite(EASIG, crArgPos($6.pos), crArgNul(), crArgPos($$.pos));
+    else if ($5 == OPSUMIG) {
+      emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
+      emite(ESUM, crArgPos($$.pos), crArgPos($6.pos), crArgPos($$.pos));
+    }
+    else {
+      emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
+      emite(EDIF, crArgPos($$.pos), crArgPos($6.pos), crArgPos($$.pos));
+    }
+
+    emite(EVA, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
   };
 /************************************************************************/
 
