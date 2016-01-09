@@ -22,18 +22,21 @@
 
 digito          [0-9]
 id              {letra}({letra}|{digito})*
-delimitador     [ \t\n]+
+delimitador     [ \t]+
+nuevalinea      \n
 letraMay        [A-Z]
 letraMin        [a-z]
 letra           {letraMay}|{letraMin}|"_"
+ctr             ({digito}*"."{digito}+)|({digito}+"."{digito}*)
 cte             {digito}+
 comentario      "//"[^\n]*"\n"
 
 
 %%
 
-{comentario}    { ; }
+{comentario}    { if (verbosidad) fprintf(stdout,"\n%3d.- ", yylineno); }
 {delimitador}   { if (verbosidad) ECHO; }
+{nuevalinea}    { if (verbosidad) {ECHO; fprintf(stdout,"%3d.- ", yylineno);}}
 
 "{"             { procesar (ABRECORCHETE_); }
 "}"             { procesar (CIERRACORCHETE_); }
@@ -82,6 +85,7 @@ comentario      "//"[^\n]*"\n"
 
 {id}            { creaNombre(); procesar (ID_) ; }
 {cte}           { creaCentera(); procesar (CTE_); }
+{ctr}           { truncCreal(); procesar (CTE_); }
 
 .               { yyerror("Caracter desconocido"); }
 

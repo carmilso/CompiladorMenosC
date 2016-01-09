@@ -19,7 +19,7 @@ void yyerror(const char * msg)
 /*  Tratamiento de errores.                                                  */
 {
   numErrores++;
-  fprintf(stdout, "Error at line %d: %s\n", yylineno, msg);
+  fprintf(stdout, "\nError at line %d: %s\n", yylineno, msg);
 }
 /*****************************************************************************/
 int main (int argc, char **argv)
@@ -39,9 +39,8 @@ int main (int argc, char **argv)
       if (verbosidad == TRUE) fprintf(stdout,"%3d.- ", yylineno);
       nom_fich = argv[argc];
       yyparse ();
-      fprintf(stdout, "numErrores = %d\n", numErrores);
       if (numErrores > 0)
-        fprintf(stdout,"\nNumero de errores:      %d\n", numErrores);
+        fprintf(stdout,"\nNumero de errores: %d\n", numErrores);
       else
       {
         fprintf(stdout, "Volcando codigo...\n");

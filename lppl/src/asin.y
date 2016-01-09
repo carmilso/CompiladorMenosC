@@ -156,11 +156,12 @@ instruccionEntradaSalida:
 	READ_ ABREPARENTESIS_ ID_ CIERRAPARENTESIS_ PUNTOCOMA_
 	{ SIMB sim = obtenerTDS($3);
 	  if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
-	  else
-      emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
+	  else if (sim.tipo != T_ENTERO) yyerror("El argumento del read debe ser entero");
+	  emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
 	}
   | PRINT_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ PUNTOCOMA_
-  { emite(EWRITE, crArgNul(), crArgNul(), crArgPos($3.pos));
+  { if ($3.tipo != T_ENTERO) yyerror("La expresion del print debe ser entera");
+    emite(EWRITE, crArgNul(), crArgNul(), crArgPos($3.pos));
   };
 /************************************************************************/
 
@@ -216,8 +217,8 @@ expresion:
     if (sim.tipo == T_ERROR) yyerror("Objeto no declarado");
     else if (!((($3.tipo == T_ENTERO) || ($3.tipo == T_LOGICO)) &&
               ((sim.tipo == T_ENTERO) || (sim.tipo == T_LOGICO)) &&
-               (sim.tipo == $3.tipo)) && ($3.tipo != T_ERROR))
-      yyerror("Error de tipos en la 'asignacion'");
+               (sim.tipo == $3.tipo) || ($3.tipo == T_ERROR))){
+        yyerror("Error de tipos en la 'asignacion'");}
     else $$.tipo = sim.tipo;
 
     $$.pos = creaVarTemp();
@@ -239,7 +240,7 @@ expresion:
     else if (sim.tipo != T_ARRAY) yyerror("El objeto debe ser un vector");
     else if (!((($6.tipo == T_ENTERO) || ($6.tipo == T_LOGICO)) &&
               ((sim.telem == T_ENTERO) || (sim.telem == T_LOGICO)) &&
-               (sim.telem == $6.tipo)) && ($3.tipo != T_ERROR))
+               (sim.telem == $6.tipo)) && ($6.tipo != T_ERROR))
 	  yyerror("Error de tipos en la 'asignacion'");
 	  else $$.tipo = sim.telem;
 
