@@ -1,6 +1,6 @@
 ###############################################################################
-#  MakeFile del compilador Menos C											  #
-#  Autores:																 	  #
+#  MakeFile del compilador Menos C                                            #
+#  Autores:                                                                   #
 #        Pau Baquero Arnal       pabaar@inf.upv.es                            #
 #        Axel Guzmán Godia       axguzgo@inf.upv.es                           #
 #        Carlos Millán Soler     carmilso@inf.upv.es                          #
