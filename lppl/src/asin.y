@@ -359,7 +359,7 @@ expresionAditiva:
   | expresionAditiva operadorAditivo expresionMultiplicativa
   { $$.tipo = T_ERROR;
     if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
-        yyerror("Los tipos deben ser enteros para operar");
+        yyerror("Los tipos deben ser enteros en 'expresion aditiva'");
     else
         $$.tipo = T_ENTERO;
 
@@ -381,7 +381,7 @@ expresionMultiplicativa:
   | expresionMultiplicativa operadorMultiplicativo expresionUnaria
   { $$.tipo = T_ERROR;
     if (!($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
-        yyerror("Los tipos deben ser enteros para operar");
+        yyerror("Los tipos deben ser enteros en 'expresion multiplicativa'");
     else
         $$.tipo = T_ENTERO;
 
