@@ -78,6 +78,8 @@ comentario      "//"[^\n]*"\n"
 "if"            { procesar (IF_); }
 "else"          { procesar (ELSE_); }
 
+"do"            { procesar (DO_); }       /*EXAMEN*/
+
 "while"         { procesar (WHILE_); }
 
 "true"          { procesar (TRUE_); }

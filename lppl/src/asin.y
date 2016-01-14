@@ -42,6 +42,8 @@
 
 %token READ_ PRINT_
 
+%token DO_                /*EXAMEN*/
+
 %token IF_ ELSE_ WHILE_
 
 %token TRUE_ FALSE_
@@ -67,6 +69,8 @@
 %type <expr> expresionMultiplicativa
 %type <expr> expresionUnaria
 %type <expr> expresionSufija
+
+%type <expr> instruccionNewWhile    /*EXAMEN*/
 
 %type <cte> operadorAsignacion
 %type <cte> operadorLogico
@@ -137,7 +141,8 @@ instruccion:
   | instruccionExpresion
   | instruccionEntradaSalida
   | instruccionSeleccion
-  | instruccionIteracion;
+  | instruccionIteracion
+  | instruccionNewWhile;
 /************************************************************************/
 
 /************************************************************************/
@@ -203,6 +208,19 @@ instruccionIteracion:
 	;
 
 /************************************************************************/
+instruccionNewWhile:
+  DO_ {
+    $<cte>$ = si;
+  }
+  instruccion WHILE_ ABREPARENTESIS_ expresion CIERRAPARENTESIS_ {
+    if ($6.tipo != T_LOGICO) yyerror("La expresion en DO WHILE no es de tipo logico");
+    $<cte>$ = creaLans(si);
+    emite(EIGUAL, crArgPos($6.pos), crArgEnt(0), crArgNul());
+  }
+  instruccion {
+    emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($<cte>2));
+    completaLans($<cte>8, crArgEtq(si));
+  }
 
 /************************************************************************/
 expresion:
